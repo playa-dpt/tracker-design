@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digitanimal 深度调研报告 2026</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <style>
+    :root {
+      --green-primary: #2d7d46;
+      --green-light: #4caf50;
+      --green-pale: #e8f5e9;
+      --green-dark: #1b5e20;
+      --gray-dark: #2c3e50;
+      --gray-mid: #546e7a;
+      --gray-light: #eceff1;
+      --white: #ffffff;
+      --accent-orange: #ff7043;
+      --accent-blue: #1565c0;
+      --accent-teal: #00796b;
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #f4f6f8;
+      color: var(--gray-dark);
+      line-height: 1.7;
+    }
+
+    /* ===== HEADER ===== */
+    .hero {
+      background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-primary) 50%, var(--green-light) 100%);
+      color: white;
+      padding: 60px 40px 50px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: -60px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .hero-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 4px 16px;
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-size: 42px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .hero h1 span { color: #a5d6a7; }
+    .hero-sub {
+      font-size: 16px;
+      opacity: 0.85;
+      margin-bottom: 32px;
+      max-width: 600px;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .hero-stat {
+      text-align: center;
+    }
+    .hero-stat .num {
+      font-size: 32px;
+      font-weight: 700;
+      color: #a5d6a7;
+      display: block;
+    }
+    .hero-stat .label {
+      font-size: 13px;
+      opacity: 0.8;
+    }
+
+    /* ===== NAV ===== */
+    .nav-bar {
+      background: white;
+      border-bottom: 2px solid var(--green-pale);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .nav-inner::-webkit-scrollbar { display: none; }
+    .nav-item {
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gray-mid);
+      cursor: pointer;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .nav-item:hover, .nav-item.active {
+      color: var(--green-primary);
+      border-bottom-color: var(--green-primary);
+    }
+
+    /* ===== MAIN LAYOUT ===== */
+    .main { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+
+    /* ===== SECTION ===== */
+    .section {
+      margin-bottom: 60px;
+      scroll-margin-top: 80px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .section-icon {
+      width: 44px; height: 44px;
+      background: var(--green-primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: white;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--gray-dark);
+    }
+    .section-subtitle {
+      font-size: 14px;
+      color: var(--gray-mid);
+      margin-top: 2px;
+    }
+
+    /* ===== CARDS ===== */
+    .card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--gray-dark);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--green-pale);
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+    @media (max-width: 900px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+      .hero h1 { font-size: 28px; }
+    }
+    @media (max-width: 600px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+
+    /* ===== KPI CARDS ===== */
+    .kpi-card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      text-align: center;
+      border-top: 4px solid var(--green-primary);
+      transition: transform 0.2s;
+    }
+    .kpi-card:hover { transform: translateY(-3px); }
+    .kpi-num {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--green-primary);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .kpi-label {
+      font-size: 13px;
+      color: var(--gray-mid);
+      font-weight: 500;
+    }
+    .kpi-sub {
+      font-size: 11px;
+      color: #90a4ae;
+      margin-top: 4px;
+    }
+
+    /* ===== TIMELINE ===== */
+    .timeline { position: relative; padding-left: 30px; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 10px; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--green-primary), var(--green-light));
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 24px;
+      padding-left: 20px;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -24px; top: 6px;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--green-primary);
+      border: 2px solid white;
+      box-shadow: 0 0 0 2px var(--green-primary);
+    }
+    .timeline-year {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green-primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .timeline-text {
+      font-size: 14px;
+      color: var(--gray-dark);
+      line-height: 1.6;
+    }
+
+    /* ===== TABLE ===== */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .data-table th {
+      background: var(--green-primary);
+      color: white;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .data-table th:first-child { border-radius: 8px 0 0 0; }
+    .data-table th:last-child { border-radius: 0 8px 0 0; }
+    .data-table td {
+      padding: 11px 16px;
+      border-bottom: 1px solid #f0f4f8;
+      color: var(--gray-dark);
+    }
+    .data-table tr:hover td { background: var(--green-pale); }
+    .data-table tr:last-child td { border-bottom: none; }
+
+    /* ===== BADGE ===== */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-green { background: #e8f5e9; color: #2e7d32; }
+    .badge-blue { background: #e3f2fd; color: #1565c0; }
+    .badge-orange { background: #fff3e0; color: #e65100; }
+    .badge-gray { background: #eceff1; color: #546e7a; }
+    .badge-red { background: #fce4ec; color: #c62828; }
+
+    /* ===== CHART CONTAINERS ===== */
+    .chart-wrap {
+      position: relative;
+      height: 300px;
+    }
+    .chart-wrap-tall {
+      position: relative;
+      height: 380px;
+    }
+    .chart-wrap-sm {
+      position: relative;
+      height: 240px;
+    }
+
+    /* ===== INSIGHT BOX ===== */
+    .insight {
+      background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+      border-left: 4px solid var(--green-primary);
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-size: 14px;
+      color: var(--gray-dark);
+    }
+    .insight strong { color: var(--green-dark); }
+
+    /* ===== PARTNER GRID ===== */
+    .partner-item {
+      background: white;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+      text-align: center;
+      border: 1px solid #e0e0e0;
+      transition: all 0.2s;
+    }
+    .partner-item:hover {
+      border-color: var(--green-primary);
+      transform: translateY(-2px);
+    }
+    .partner-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gray-dark);
+      margin-bottom: 6px;
+    }
+    .partner-role {
+      font-size: 12px;
+      color: var(--gray-mid);
+    }
+    .partner-icon {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    /* ===== PRODUCT CARD ===== */
+    .product-card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .product-card:hover { border-color: var(--green-primary); }
+    .product-card.featured::before {
+      content: '旗舰';
+      position: absolute;
+      top: 12px; right: -20px;
+      background: var(--green-primary);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 28px;
+      transform: rotate(45deg);
+    }
+    .product-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--green-dark);
+      margin-bottom: 4px;
+    }
+    .product-type {
+      font-size: 12px;
+      color: var(--gray-mid);
+      margin-bottom: 16px;
+    }
+    .product-price {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--green-primary);
+      margin-bottom: 16px;
+    }
+    .product-price span {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--gray-mid);
+    }
+    .spec-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 13px;
+    }
+    .spec-key { color: var(--gray-mid); }
+    .spec-val { font-weight: 600; color: var(--gray-dark); }
+
+    /* ===== SWOT ===== */
+    .swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .swot-box {
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .swot-box.s { background: #e8f5e9; border-left: 4px solid #2e7d32; }
+    .swot-box.w { background: #fff3e0; border-left: 4px solid #e65100; }
+    .swot-box.o { background: #e3f2fd; border-left: 4px solid #1565c0; }
+    .swot-box.t { background: #fce4ec; border-left: 4px solid #c62828; }
+    .swot-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .swot-box.s .swot-title { color: #2e7d32; }
+    .swot-box.w .swot-title { color: #e65100; }
+    .swot-box.o .swot-title { color: #1565c0; }
+    .swot-box.t .swot-title { color: #c62828; }
+    .swot-list { list-style: none; }
+    .swot-list li {
+      font-size: 13px;
+      color: var(--gray-dark);
+      padding: 4px 0;
+      padding-left: 16px;
+      position: relative;
+    }
+    .swot-list li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      opacity: 0.6;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      background: var(--gray-dark);
+      color: #90a4ae;
+      text-align: center;
+      padding: 32px 20px;
+      font-size: 13px;
+      margin-top: 60px;
+    }
+    .footer a { color: #80cbc4; text-decoration: none; }
+
+    /* ===== PROGRESS BAR ===== */
+    .progress-wrap { margin: 8px 0; }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .progress-bar {
+      height: 8px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--green-primary), var(--green-light));
+      transition: width 1s ease;
+    }
+
+    /* ===== RATING STARS ===== */
+    .stars { color: #ffc107; font-size: 16px; }
+
+    /* ===== SCROLL ANIMATIONS ===== */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== COMPETITOR RADAR ===== */
+    .comp-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f4f8;
+    }
+    .comp-row:last-child { border-bottom: none; }
+    .comp-name { width: 120px; font-size: 13px; font-weight: 600; color: var(--gray-dark); }
+    .comp-bar-wrap { flex: 1; }
+    .comp-score { width: 40px; text-align: right; font-size: 13px; font-weight: 700; color: var(--green-primary); }
+
+    /* ===== TAG CLOUD ===== */
+    .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag {
+      background: var(--green-pale);
+      color: var(--green-dark);
+      border: 1px solid #c8e6c9;
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* ===== RISK MATRIX ===== */
+    .risk-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f4f8;
+    }
+    .risk-level {
+      width: 60px;
+      text-align: center;
+      padding: 3px 6px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .risk-high { background: #fce4ec; color: #c62828; }
+    .risk-mid { background: #fff3e0; color: #e65100; }
+    .risk-low { background: #e8f5e9; color: #2e7d32; }
+    .risk-text { font-size: 13px; color: var(--gray-dark); }
+    .risk-title { font-weight: 600; margin-bottom: 2px; }
+  </style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">深度竞品调研报告 · 2026</div>
+    <h1>Digitanimal <span>深度调研报告</span></h1>
+    <p class="hero-sub">西班牙领先畜牧业 GPS 追踪科技公司 · 全维度商业分析 · 数据截至 2026年4月</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="num">80+</span>
+        <span class="label">覆盖国家</span>
+      </div>
+      <div class="hero-stat">
+        <span class="num">10,000+</span>
+        <span class="label">全球客户</span>
+      </div>
+      <div class="hero-stat">
+        <span class="num">2015</span>
+        <span class="label">创立年份</span>
+      </div>
+      <div class="hero-stat">
+        <span class="num">€179.95</span>
+        <span class="label">核心产品起价</span>
+      </div>
+      <div class="hero-stat">
+        <span class="num">$5.73B</span>
+        <span class="label">2025年行业市场规模</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NAV ===== -->
+<div class="nav-bar">
+  <div class="nav-inner">
+    <div class="nav-item active" onclick="scrollTo('overview')">公司概览</div>
+    <div class="nav-item" onclick="scrollTo('timeline')">发展历程</div>
+    <div class="nav-item" onclick="scrollTo('products')">产品矩阵</div>
+    <div class="nav-item" onclick="scrollTo('tech')">技术路线</div>
+    <div class="nav-item" onclick="scrollTo('market')">市场格局</div>
+    <div class="nav-item" onclick="scrollTo('competitors')">竞争对手</div>
+    <div class="nav-item" onclick="scrollTo('marketing')">营销策略</div>
+    <div class="nav-item" onclick="scrollTo('swot')">SWOT 分析</div>
+    <div class="nav-item" onclick="scrollTo('risks')">风险评估</div>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+
+  <!-- ===== SECTION 1: OVERVIEW ===== -->
+  <div class="section fade-in" id="overview">
+    <div class="section-header">
+      <div class="section-icon">🏢</div>
+      <div>
+        <div class="section-title">公司概览</div>
+        <div class="section-subtitle">Company Overview · 核心指标与基本信息</div>
+      </div>
+    </div>
+
+    <div class="grid-4" style="margin-bottom:20px;">
+      <div class="kpi-card">
+        <div class="kpi-num">80+</div>
+        <div class="kpi-label">覆盖国家</div>
+        <div class="kpi-sub">西班牙、法国、英国、拉美等</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">10,000+</div>
+        <div class="kpi-label">全球客户数</div>
+        <div class="kpi-sub">含政府机构、农场主</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">24–50</div>
+        <div class="kpi-label">员工规模</div>
+        <div class="kpi-sub">LinkedIn 数据</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">4.5★</div>
+        <div class="kpi-label">Google 评分</div>
+        <div class="kpi-sub">26条评价</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">🌍 公司基本信息</div>
+        <table class="data-table">
+          <tr><td>公司全名</td><td><strong>Digitanimal S.L.</strong></td></tr>
+          <tr><td>创立时间</td><td>2015年（初名 STEPLA）</td></tr>
+          <tr><td>总部地址</td><td>西班牙马德里，圣费尔南多德埃纳雷斯</td></tr>
+          <tr><td>附属办公室</td><td>马拉加科技园（Parque Tecnológico de Andalucía）</td></tr>
+          <tr><td>官方网站</td><td><a href="https://digitanimal.com" target="_blank" style="color:var(--green-primary)">digitanimal.com</a></td></tr>
+          <tr><td>产品类别</td><td>畜牧业 GPS 追踪器 + 虚拟围栏 + 数据平台</td></tr>
+          <tr><td>目标动物</td><td>牛、羊、马、山羊、骆驼</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">💰 融资与投资方</div>
+        <div class="insight">
+          <strong>融资总额约 $17.8万（公开数据）</strong>，以种子轮与政府补助金为主，估值尚未公开披露。公司采用轻资产扩张模式，通过技术合作伙伴关系（如 Deutsche Telekom、Astrocast）快速获取全球资源。
+        </div>
+        <table class="data-table">
+          <tr><th>投资方</th><th>类型</th></tr>
+          <tr><td>IMPACT Accelerator</td><td><span class="badge badge-blue">加速器</span></td></tr>
+          <tr><td>Innsomnia</td><td><span class="badge badge-blue">加速器</span></td></tr>
+          <tr><td>Hubraum (Deutsche Telekom)</td><td><span class="badge badge-green">战略投资</span></td></tr>
+          <tr><td>madri+d 知识基金会</td><td><span class="badge badge-orange">政府基金</span></td></tr>
+          <tr><td>马德里自治区（2025）</td><td><span class="badge badge-orange">政府资助 €10万</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">📱 数字媒体表现</div>
+      <div class="grid-4">
+        <div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>YouTube 订阅</span><span>1,660</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:33%"></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>Facebook 粉丝</span><span>19,000</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:76%"></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>Google Play 评分</span><span>4.0/5.0</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:80%"></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>App Store 评分</span><span>3.8/5.0</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:76%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2: TIMELINE ===== -->
+  <div class="section fade-in" id="timeline">
+    <div class="section-header">
+      <div class="section-icon">📅</div>
+      <div>
+        <div class="section-title">发展历程</div>
+        <div class="section-subtitle">Company Milestones · 从农场痛点到全球布局</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">🚀 创业历程（2015–2022）</div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-year">2015</div>
+            <div class="timeline-text">公司成立（初名 STEPLA）。创始人 Rubén Blanco 因牧场走失牛只蒙受损失，与 Carlos Callejero、Ignacio Gómez Maqueda 共同创业，首款原型设备在阿维拉农场完成测试。</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2016</div>
+            <div class="timeline-text">以"STEPLA"名义参展巴塞罗那 <strong>Mobile World Congress</strong>，将牛GPS项圈带入全球最大移动科技展，获得国际曝光。</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2017–2018</div>
+            <div class="timeline-text">在马德里莫斯托莱斯开设首个办公室，完成首轮融资，推出第一款商业产品 V1，开始正式商业化运营。</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2019</div>
+            <div class="timeline-text">在 Datagri 论坛发布<strong>智能牲畜重秤</strong>，首次将业务扩展至 GPS 追踪之外，探索综合畜牧管理解决方案。</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2020–2021</div>
+            <div class="timeline-text">迁址至圣费尔南多德埃纳雷斯，正式启动国际化战略，开始进入欧洲多国市场。</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2022</div>
+            <div class="timeline-text">推出第二代旗舰产品 <strong>Digitanimal EVO</strong>，进入 80+ 国家市场，确立全球化布局。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🌐 全球扩张（2023–2026）</div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-year">2023</div>
+            <div class="timeline-text">成为西班牙政府<strong>"数字套件（Kit Digital）"</strong>官方数字化代理商，服务数百家西班牙农场，享受政府100%补贴支持。</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2024</div>
+            <div class="timeline-text">推出 <strong>EVO 2</strong> 和 <strong>ECO 太阳能版</strong>，与 Gallagher 合作推出虚拟围栏解决方案；与 Astrocast 达成卫星IoT合作伙伴关系。</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2025</div>
+            <div class="timeline-text">获马德里自治区 <strong>10万欧元资助</strong>；推出 Datanimal 数据分析平台；完成 5G NTN 卫星追踪器量产；SAT项圈获 Skylo 官方认证。</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2026</div>
+            <div class="timeline-text">在 <strong>MWC 2026</strong> 展示多轨道连接架构（NB-IoT + 卫星 GEO/LEO 无缝切换），标志着技术路线进入全球卫星IoT新阶段。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 3: PRODUCTS ===== -->
+  <div class="section fade-in" id="products">
+    <div class="section-header">
+      <div class="section-icon">📦</div>
+      <div>
+        <div class="section-title">产品矩阵</div>
+        <div class="section-subtitle">Product Portfolio · 硬件设备 + 数据平台</div>
+      </div>
+    </div>
+
+    <div class="grid-4" style="margin-bottom:20px;">
+      <div class="product-card">
+        <div class="product-name">EVO</div>
+        <div class="product-type">GPS项圈 · 基础版</div>
+        <div class="product-price">€179.95 <span>不含税</span></div>
+        <div class="spec-item"><span class="spec-key">重量</span><span class="spec-val">265g</span></div>
+        <div class="spec-item"><span class="spec-key">电池续航</span><span class="spec-val">6个月–2年</span></div>
+        <div class="spec-item"><span class="spec-key">通信方式</span><span class="spec-val">GSM/Sigfox/LoRa/NB-IoT</span></div>
+        <div class="spec-item"><span class="spec-key">防水等级</span><span class="spec-val">IP67</span></div>
+      </div>
+      <div class="product-card featured">
+        <div class="product-name">EVO 2</div>
+        <div class="product-type">GPS项圈 · 升级版</div>
+        <div class="product-price">待公开 <span>价格未披露</span></div>
+        <div class="spec-item"><span class="spec-key">重量</span><span class="spec-val">265g</span></div>
+        <div class="spec-item"><span class="spec-key">电池续航</span><span class="spec-val">超长续航</span></div>
+        <div class="spec-item"><span class="spec-key">通信方式</span><span class="spec-val">GSM/Sigfox/卫星</span></div>
+        <div class="spec-item"><span class="spec-key">发布时间</span><span class="spec-val">2024年11月</span></div>
+      </div>
+      <div class="product-card">
+        <div class="product-name">ECO</div>
+        <div class="product-type">GPS项圈 · 太阳能版</div>
+        <div class="product-price">€189.95 <span>不含税</span></div>
+        <div class="spec-item"><span class="spec-key">重量</span><span class="spec-val">265g</span></div>
+        <div class="spec-item"><span class="spec-key">电池续航</span><span class="spec-val">太阳能自动充电</span></div>
+        <div class="spec-item"><span class="spec-key">通信方式</span><span class="spec-val">GSM/Sigfox</span></div>
+        <div class="spec-item"><span class="spec-key">特色</span><span class="spec-val">无需更换电池</span></div>
+      </div>
+      <div class="product-card">
+        <div class="product-name">Virtual Fencing</div>
+        <div class="product-type">虚拟围栏项圈</div>
+        <div class="product-price">€449.95 <span>（促销€339.94）</span></div>
+        <div class="spec-item"><span class="spec-key">供电</span><span class="spec-val">太阳能</span></div>
+        <div class="spec-item"><span class="spec-key">通信方式</span><span class="spec-val">GSM+震动/声音</span></div>
+        <div class="spec-item"><span class="spec-key">合作方</span><span class="spec-val">Gallagher</span></div>
+        <div class="spec-item"><span class="spec-key">折扣</span><span class="spec-val">约24.5%</span></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">📊 套装折扣策略（ECO太阳能版）</div>
+        <div class="chart-wrap">
+          <canvas id="discountChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🤖 Datanimal 数据分析平台（2025新品）</div>
+        <div class="insight">
+          <strong>战略转型标志：</strong>Digitanimal 从"硬件公司"向"数据服务公司"转型的核心产品。基于 FIWARE 架构，集成 AI 算法，将 GPS 追踪数据转化为可操作的农场管理建议。
+        </div>
+        <table class="data-table">
+          <tr><th>功能模块</th><th>说明</th></tr>
+          <tr><td>行为趋势分析</td><td>追踪动物运动轨迹与活动规律</td></tr>
+          <tr><td>牧场利用率对比</td><td>分析不同区域的牧场使用效率</td></tr>
+          <tr><td>异常模式检测</td><td>AI 自动识别异常行为，预警疾病</td></tr>
+          <tr><td>个体健康评分</td><td>为每头动物生成健康评分报告</td></tr>
+          <tr><td>发情/分娩检测</td><td>通过行为数据预测繁殖事件</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 4: TECH ===== -->
+  <div class="section fade-in" id="tech">
+    <div class="section-header">
+      <div class="section-icon">⚙️</div>
+      <div>
+        <div class="section-title">技术路线</div>
+        <div class="section-subtitle">Technology Roadmap · 从 Sigfox 到 5G NTN 卫星</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">📡 通信协议演进路线</div>
+        <div class="chart-wrap">
+          <canvas id="techRadar"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🛰️ 技术里程碑</div>
+        <table class="data-table">
+          <tr><th>技术</th><th>状态</th><th>说明</th></tr>
+          <tr><td>Sigfox / LoRa</td><td><span class="badge badge-gray">早期</span></td><td>低功耗IoT，电池寿命18个月</td></tr>
+          <tr><td>NB-IoT</td><td><span class="badge badge-green">主流</span></td><td>蜂窝IoT，广覆盖低功耗</td></tr>
+          <tr><td>Astrocast 卫星IoT</td><td><span class="badge badge-blue">量产</span></td><td>纳米卫星，无蜂窝区域覆盖</td></tr>
+          <tr><td>5G NTN (Skylo)</td><td><span class="badge badge-blue">2025量产</span></td><td>3GPP R17，GEO/LEO无缝切换</td></tr>
+          <tr><td>虚拟围栏</td><td><span class="badge badge-green">商用</span></td><td>声音+微电流双重反馈</td></tr>
+          <tr><td>Datanimal AI平台</td><td><span class="badge badge-blue">2025新品</span></td><td>FIWARE架构，AI健康评分</td></tr>
+        </table>
+        <div class="insight" style="margin-top:16px;">
+          <strong>核心技术壁垒：</strong>Digitanimal 是全球首家推出采用磁性环形天线的 5G NTN 牲畜追踪器的公司，与德国电信 Hubraum 和 Skylo 的深度合作构成了显著的技术护城河。
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">🤝 技术合作生态</div>
+      <div class="grid-4" style="margin-top:8px;">
+        <div class="partner-item">
+          <div class="partner-icon">🛰️</div>
+          <div class="partner-name">Astrocast</div>
+          <div class="partner-role">卫星IoT通信 · 纳米卫星网络 · 无蜂窝区域全球覆盖</div>
+        </div>
+        <div class="partner-item">
+          <div class="partner-icon">🔒</div>
+          <div class="partner-name">Gallagher</div>
+          <div class="partner-role">虚拟围栏技术整合 · 全球最大电围栏品牌</div>
+        </div>
+        <div class="partner-item">
+          <div class="partner-icon">📶</div>
+          <div class="partner-name">Skylo / Deutsche Telekom</div>
+          <div class="partner-role">5G NTN卫星直连 · 2025年3月完成量产认证</div>
+        </div>
+        <div class="partner-item">
+          <div class="partner-icon">📡</div>
+          <div class="partner-name">Sigfox</div>
+          <div class="partner-role">低功耗IoT网络 · 延长电池寿命至18个月</div>
+        </div>
+        <div class="partner-item">
+          <div class="partner-icon">📻</div>
+          <div class="partner-name">Antennity</div>
+          <div class="partner-role">天线设计 · 荣获行业奖项</div>
+        </div>
+        <div class="partner-item">
+          <div class="partner-icon">🌐</div>
+          <div class="partner-name">FIWARE Foundation</div>
+          <div class="partner-role">开放数据架构 · Datanimal平台底层技术</div>
+        </div>
+        <div class="partner-item">
+          <div class="partner-icon">🚜</div>
+          <div class="partner-name">John Deere</div>
+          <div class="partner-role">马德里Parla创新中心合作 · 青年农民数字化项目</div>
+        </div>
+        <div class="partner-item">
+          <div class="partner-icon">🏛️</div>
+          <div class="partner-name">西班牙政府</div>
+          <div class="partner-role">Kit Digital官方代理商 · 补贴最高€29,000/农场</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 5: MARKET ===== -->
+  <div class="section fade-in" id="market">
+    <div class="section-header">
+      <div class="section-icon">📈</div>
+      <div>
+        <div class="section-title">市场格局</div>
+        <div class="section-subtitle">Market Landscape · 全球畜牧业监测市场分析</div>
+      </div>
+    </div>
+
+    <div class="grid-4" style="margin-bottom:20px;">
+      <div class="kpi-card">
+        <div class="kpi-num">$5.73B</div>
+        <div class="kpi-label">2025年市场规模</div>
+        <div class="kpi-sub">全球畜牧业监测市场</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">12.8%</div>
+        <div class="kpi-label">复合年增长率</div>
+        <div class="kpi-sub">2025–2033年预测</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">$14.82B</div>
+        <div class="kpi-label">2033年预测规模</div>
+        <div class="kpi-sub">Grand View Research</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">38%</div>
+        <div class="kpi-label">北美市场份额</div>
+        <div class="kpi-sub">最大单一市场</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">🌍 全球市场规模预测（2023–2033）</div>
+        <div class="chart-wrap">
+          <canvas id="marketGrowthChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🗺️ 区域市场份额分布</div>
+        <div class="chart-wrap">
+          <canvas id="regionChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">🔑 行业核心驱动趋势</div>
+      <div class="grid-3">
+        <div style="padding:16px; background:#e8f5e9; border-radius:10px;">
+          <div style="font-size:24px;margin-bottom:8px;">🔒</div>
+          <div style="font-weight:700;color:var(--green-dark);margin-bottom:6px;">虚拟围栏普及</div>
+          <div style="font-size:13px;color:var(--gray-mid);">允许牧民通过GPS项圈设定无形边界，替代传统物理围栏，降低基础设施成本。</div>
+        </div>
+        <div style="padding:16px; background:#e3f2fd; border-radius:10px;">
+          <div style="font-size:24px;margin-bottom:8px;">🤖</div>
+          <div style="font-weight:700;color:#1565c0;margin-bottom:6px;">AI健康监测</div>
+          <div style="font-size:13px;color:var(--gray-mid);">结合AI算法实时预测动物疾病、发情期和分娩时间，提升繁殖效率和兽医响应速度。</div>
+        </div>
+        <div style="padding:16px; background:#fff3e0; border-radius:10px;">
+          <div style="font-size:24px;margin-bottom:8px;">🛰️</div>
+          <div style="font-weight:700;color:#e65100;margin-bottom:6px;">卫星IoT覆盖</div>
+          <div style="font-size:13px;color:var(--gray-mid);">解决偏远牧场无蜂窝网络覆盖的痛点，通过卫星直连实现全球任意地点的实时追踪。</div>
+        </div>
+        <div style="padding:16px; background:#f3e5f5; border-radius:10px;">
+          <div style="font-size:24px;margin-bottom:8px;">⚡</div>
+          <div style="font-weight:700;color:#6a1b9a;margin-bottom:6px;">太阳能供电</div>
+          <div style="font-size:13px;color:var(--gray-mid);">太阳能充电技术消除了定期更换电池的运营成本，大幅降低大规模部署的 TCO。</div>
+        </div>
+        <div style="padding:16px; background:#e0f2f1; border-radius:10px;">
+          <div style="font-size:24px;margin-bottom:8px;">📊</div>
+          <div style="font-weight:700;color:#00695c;margin-bottom:6px;">精准畜牧业</div>
+          <div style="font-size:13px;color:var(--gray-mid);">数据驱动的牧场管理决策，从GPS定位延伸至行为分析、健康评分、产量预测等全链路。</div>
+        </div>
+        <div style="padding:16px; background:#fce4ec; border-radius:10px;">
+          <div style="font-size:24px;margin-bottom:8px;">🏛️</div>
+          <div style="font-weight:700;color:#c62828;margin-bottom:6px;">政策补贴驱动</div>
+          <div style="font-size:13px;color:var(--gray-mid);">欧盟和各国政府的农业数字化补贴政策（如西班牙Kit Digital）大幅降低农民采购门槛。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 6: COMPETITORS ===== -->
+  <div class="section fade-in" id="competitors">
+    <div class="section-header">
+      <div class="section-icon">⚔️</div>
+      <div>
+        <div class="section-title">竞争对手分析</div>
+        <div class="section-subtitle">Competitive Analysis · 主要竞品对比</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-title">🏆 主要竞争对手全面对比</div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>公司</th>
+              <th>产品类型</th>
+              <th>价格</th>
+              <th>核心优势</th>
+              <th>主要劣势</th>
+              <th>市场定位</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:var(--green-primary)">Digitanimal ★</strong></td>
+              <td>GPS项圈+虚拟围栏+数据平台</td>
+              <td>€179.95–€449.95</td>
+              <td>欧洲深耕、性价比高、卫星IoT、虚拟围栏</td>
+              <td>品牌知名度相对较低、融资规模小</td>
+              <td><span class="badge badge-green">欧洲中小农场</span></td>
+            </tr>
+            <tr>
+              <td><strong>Allflex (Merck)</strong></td>
+              <td>耳标+项圈健康监测</td>
+              <td>$2.5–4/头/月（订阅）</td>
+              <td>全球市场领导者、健康监测全面、品牌背书强</td>
+              <td>价格高、硬件成本高、系统复杂</td>
+              <td><span class="badge badge-blue">大型农场/企业</span></td>
+            </tr>
+            <tr>
+              <td><strong>Datamars</strong></td>
+              <td>综合畜牧管理系统</td>
+              <td>未公开</td>
+              <td>全球覆盖广、行业经验丰富、完整解决方案</td>
+              <td>产品复杂、中小农场适配性差</td>
+              <td><span class="badge badge-blue">大型农场/企业</span></td>
+            </tr>
+            <tr>
+              <td><strong>Ceres Tag</strong></td>
+              <td>直连卫星耳标</td>
+              <td>约$193/个</td>
+              <td>无需基站、真正全球覆盖、澳洲市场强</td>
+              <td>价格较高、功能相对单一</td>
+              <td><span class="badge badge-orange">偏远地区/澳洲</span></td>
+            </tr>
+            <tr>
+              <td><strong>Moocall</strong></td>
+              <td>产犊监测传感器</td>
+              <td>$299</td>
+              <td>产犊细分领域领导者、精准度高</td>
+              <td>功能单一、不支持GPS追踪</td>
+              <td><span class="badge badge-gray">产犊管理细分</span></td>
+            </tr>
+            <tr>
+              <td><strong>HerdDogg</strong></td>
+              <td>长距离蓝牙耳标</td>
+              <td>约$0.08/天</td>
+              <td>成本极低、中小牧场友好</td>
+              <td>覆盖范围有限（蓝牙）、功能基础</td>
+              <td><span class="badge badge-gray">成本敏感市场</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">💰 价格竞争力对比</div>
+        <div class="chart-wrap">
+          <canvas id="priceChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎯 综合能力雷达图</div>
+        <div class="chart-wrap">
+          <canvas id="radarChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 7: MARKETING ===== -->
+  <div class="section fade-in" id="marketing">
+    <div class="section-header">
+      <div class="section-icon">📣</div>
+      <div>
+        <div class="section-title">营销策略分析</div>
+        <div class="section-subtitle">Marketing Strategy · SEO、内容、渠道与客户服务</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">🔍 SEO 关键词策略</div>
+        <div class="tag-cloud">
+          <span class="tag">GPS cattle tracker</span>
+          <span class="tag">GPS goat tracker</span>
+          <span class="tag">GPS horse tracker</span>
+          <span class="tag">Livestock GPS collar</span>
+          <span class="tag">Animal GPS collar</span>
+          <span class="tag">Virtual fencing for livestock</span>
+          <span class="tag">GPS sheep tracker</span>
+          <span class="tag">Cattle tracking device</span>
+          <span class="tag">Livestock monitoring</span>
+          <span class="tag">Smart farming IoT</span>
+        </div>
+        <div class="insight" style="margin-top:16px;">
+          Digitanimal 的 SEO 策略聚焦于<strong>动物种类+功能</strong>的长尾关键词组合，覆盖牛、羊、马、山羊等主要畜牧动物，同时布局"虚拟围栏"这一新兴高价值关键词。
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📺 YouTube 内容策略</div>
+        <table class="data-table">
+          <thead>
+            <tr><th>视频类型</th><th>代表内容</th><th>典型播放量</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>产品介绍</td><td>GPS cattle tracker - Tracking and monitoring livestock</td><td>42,000次</td></tr>
+            <tr><td>客户案例</td><td>Digitanimal Cattle GPS Trackers at Chatsworth House</td><td>11,000次</td></tr>
+            <tr><td>媒体报道</td><td>Telemadrid、Canal Extremadura、SIC Noticias</td><td>200–600次</td></tr>
+            <tr><td>行业活动</td><td>John Deere España合作活动</td><td>15次</td></tr>
+            <tr><td>新功能发布</td><td>Datanimal新App介绍</td><td>15次</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">🛡️ 客户服务与信任建设策略</div>
+      <div class="grid-4">
+        <div style="text-align:center;padding:16px;">
+          <div style="font-size:32px;margin-bottom:8px;">💬</div>
+          <div style="font-weight:700;margin-bottom:6px;">WhatsApp 直接联系</div>
+          <div style="font-size:13px;color:var(--gray-mid);">网站右下角常驻WhatsApp按钮，降低咨询门槛，提升转化率</div>
+        </div>
+        <div style="text-align:center;padding:16px;">
+          <div style="font-size:32px;margin-bottom:8px;">🔄</div>
+          <div style="font-weight:700;margin-bottom:6px;">14天无理由退款</div>
+          <div style="font-size:13px;color:var(--gray-mid);">降低购买风险，提升首次购买转化率，建立信任</div>
+        </div>
+        <div style="text-align:center;padding:16px;">
+          <div style="font-size:32px;margin-bottom:8px;">🌍</div>
+          <div style="font-weight:700;margin-bottom:6px;">10+语言本地化</div>
+          <div style="font-size:13px;color:var(--gray-mid);">英语、西班牙语、法语、意大利语、葡萄牙语、罗马尼亚语等</div>
+        </div>
+        <div style="text-align:center;padding:16px;">
+          <div style="font-size:32px;margin-bottom:8px;">🔋</div>
+          <div style="font-weight:700;margin-bottom:6px;">年度电池更换服务</div>
+          <div style="font-size:13px;color:var(--gray-mid);">EVO版提供每年更换电池的服务承诺，降低运营成本顾虑</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 8: SWOT ===== -->
+  <div class="section fade-in" id="swot">
+    <div class="section-header">
+      <div class="section-icon">🔬</div>
+      <div>
+        <div class="section-title">SWOT 战略分析</div>
+        <div class="section-subtitle">Strengths · Weaknesses · Opportunities · Threats</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="swot-grid">
+        <div class="swot-box s">
+          <div class="swot-title">💪 优势 Strengths</div>
+          <ul class="swot-list">
+            <li>创始团队拥有40年以上畜牧业家族背景，产品极具实用导向</li>
+            <li>全球首款 5G NTN 卫星牲畜追踪器，技术领先优势显著</li>
+            <li>80+国家市场覆盖，10,000+客户基础，国际化布局成熟</li>
+            <li>西班牙政府 Kit Digital 官方代理商，政策护城河强</li>
+            <li>与 Gallagher、Deutsche Telekom、Astrocast 等巨头的战略合作</li>
+            <li>产品性价比高（€179.95起），套装折扣策略吸引大规模部署</li>
+            <li>多通信协议支持（GSM/Sigfox/LoRa/NB-IoT/卫星），适应性强</li>
+          </ul>
+        </div>
+        <div class="swot-box w">
+          <div class="swot-title">⚠️ 劣势 Weaknesses</div>
+          <ul class="swot-list">
+            <li>融资规模较小（约$17.8万公开数据），资金实力有限</li>
+            <li>员工规模仅24-50人，扩张速度受限于人力资源</li>
+            <li>YouTube订阅仅1,660，品牌内容营销影响力较弱</li>
+            <li>EVO 2 价格尚未公开，产品线透明度不足</li>
+            <li>与 Allflex、Datamars 等巨头相比，品牌认知度差距明显</li>
+            <li>健康监测功能相对竞品（如 Allflex SenseHub）仍有差距</li>
+          </ul>
+        </div>
+        <div class="swot-box o">
+          <div class="swot-title">🚀 机会 Opportunities</div>
+          <ul class="swot-list">
+            <li>全球畜牧业监测市场 CAGR 12.8%，至2033年达$14.82B</li>
+            <li>欧盟农业数字化补贴政策持续加码，降低市场准入门槛</li>
+            <li>亚太地区（中国、印度、东南亚）是增长最快的新兴市场</li>
+            <li>虚拟围栏技术在全球范围内尚处早期普及阶段，先发优势明显</li>
+            <li>Datanimal 数据平台可开拓 SaaS 订阅收入，提升 LTV</li>
+            <li>碳排放监测需求增加，畜牧业碳足迹追踪是新兴蓝海</li>
+            <li>与保险公司合作，基于健康数据提供畜牧业保险产品</li>
+          </ul>
+        </div>
+        <div class="swot-box t">
+          <div class="swot-title">⚡ 威胁 Threats</div>
+          <ul class="swot-list">
+            <li>Allflex（Merck）、Datamars 等巨头资金雄厚，可快速跟进技术</li>
+            <li>Ceres Tag 等新兴竞品在卫星直连领域形成直接竞争</li>
+            <li>硬件成本压力：芯片短缺和供应链波动影响利润率</li>
+            <li>Sigfox 网络已于2022年破产，依赖单一通信协议存在风险</li>
+            <li>数据隐私法规（GDPR等）对农业数据收集和使用的限制</li>
+            <li>中国低成本竞争者可能进入欧洲市场，价格战风险</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 9: RISKS ===== -->
+  <div class="section fade-in" id="risks">
+    <div class="section-header">
+      <div class="section-icon">⚠️</div>
+      <div>
+        <div class="section-title">风险评估与战略建议</div>
+        <div class="section-subtitle">Risk Assessment · 核心风险与应对策略</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">🚨 主要风险矩阵</div>
+        <div class="risk-item">
+          <div class="risk-level risk-high">高风险</div>
+          <div class="risk-text">
+            <div class="risk-title">竞争巨头跟进虚拟围栏技术</div>
+            Allflex/Merck 等巨头一旦发力虚拟围栏，凭借品牌和渠道优势可快速侵蚀市场份额。
+          </div>
+        </div>
+        <div class="risk-item">
+          <div class="risk-level risk-high">高风险</div>
+          <div class="risk-text">
+            <div class="risk-title">融资不足制约扩张速度</div>
+            当前融资规模约$17.8万，与市场扩张需求严重不匹配，可能错失市场窗口期。
+          </div>
+        </div>
+        <div class="risk-item">
+          <div class="risk-level risk-mid">中风险</div>
+          <div class="risk-text">
+            <div class="risk-title">通信网络依赖风险</div>
+            Sigfox 已破产，过度依赖单一通信协议存在服务中断风险；需加速多协议冗余部署。
+          </div>
+        </div>
+        <div class="risk-item">
+          <div class="risk-level risk-mid">中风险</div>
+          <div class="risk-text">
+            <div class="risk-title">数据平台商业化挑战</div>
+            Datanimal 平台从免费/硬件捆绑向付费订阅转型，农民付费意愿和转化率存在不确定性。
+          </div>
+        </div>
+        <div class="risk-item">
+          <div class="risk-level risk-low">低风险</div>
+          <div class="risk-text">
+            <div class="risk-title">政府补贴政策变化</div>
+            Kit Digital 补贴依赖度高，政策调整可能影响西班牙本土市场增长。
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">💡 战略建议</div>
+        <div class="insight">
+          <strong>建议一：加速 Series A 融资</strong><br>
+          当前技术积累和市场验证已具备融资条件，应积极寻求 $500万–$1000万 Series A，重点用于欧洲以外市场（拉美、中东、亚太）的渠道建设。
+        </div>
+        <div class="insight">
+          <strong>建议二：深化 Datanimal 平台变现</strong><br>
+          从"卖硬件"向"卖数据订阅"转型，参考 Allflex SenseHub 的订阅模式，推出按月/年收费的 AI 健康监测服务，提升客户 LTV 和收入可预期性。
+        </div>
+        <div class="insight">
+          <strong>建议三：布局碳排放监测赛道</strong><br>
+          结合欧盟碳中和政策，开发畜牧业碳足迹追踪功能，与碳信用市场对接，开拓新的收入来源并提升产品溢价。
+        </div>
+        <div class="insight">
+          <strong>建议四：强化品牌内容营销</strong><br>
+          YouTube 订阅仅 1,660，与产品质量严重不匹配。应增加专业农场实测视频、客户成功案例和技术深度内容，提升品牌认知度和有机流量。
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">📊 综合评分（满分10分）</div>
+      <div class="grid-3">
+        <div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>技术创新能力</span><span style="color:var(--green-primary);font-weight:700;">9.0</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:90%"></div></div>
+          </div>
+          <div class="progress-wrap" style="margin-top:12px;">
+            <div class="progress-label"><span>产品竞争力</span><span style="color:var(--green-primary);font-weight:700;">8.0</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:80%"></div></div>
+          </div>
+          <div class="progress-wrap" style="margin-top:12px;">
+            <div class="progress-label"><span>市场覆盖广度</span><span style="color:var(--green-primary);font-weight:700;">8.5</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:85%"></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>品牌影响力</span><span style="color:var(--accent-orange);font-weight:700;">5.5</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:55%;background:linear-gradient(90deg,#ff7043,#ffb74d)"></div></div>
+          </div>
+          <div class="progress-wrap" style="margin-top:12px;">
+            <div class="progress-label"><span>融资实力</span><span style="color:var(--accent-orange);font-weight:700;">4.5</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:45%;background:linear-gradient(90deg,#ff7043,#ffb74d)"></div></div>
+          </div>
+          <div class="progress-wrap" style="margin-top:12px;">
+            <div class="progress-label"><span>内容营销</span><span style="color:var(--accent-orange);font-weight:700;">5.0</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:50%;background:linear-gradient(90deg,#ff7043,#ffb74d)"></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>合作伙伴生态</span><span style="color:var(--green-primary);font-weight:700;">9.0</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:90%"></div></div>
+          </div>
+          <div class="progress-wrap" style="margin-top:12px;">
+            <div class="progress-label"><span>客户满意度</span><span style="color:var(--green-primary);font-weight:700;">8.0</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:80%"></div></div>
+          </div>
+          <div class="progress-wrap" style="margin-top:12px;">
+            <div class="progress-label"><span>增长潜力</span><span style="color:var(--green-primary);font-weight:700;">9.5</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:95%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DATA SOURCES ===== -->
+  <div class="card fade-in" style="margin-top:40px;">
+    <div class="card-title">📚 数据来源与参考资料</div>
+    <div style="font-size:13px;color:var(--gray-mid);line-height:2;">
+      <strong>一手数据来源：</strong>digitanimal.com · astrocast.com · youtube.com/@digitanimal2360 · telemadrid.es · elreferente.es<br>
+      <strong>市场数据来源：</strong>Grand View Research · MarketsandMarkets · FutureDataStats · MarketIntelo<br>
+      <strong>竞品数据来源：</strong>cerestag.com · moocall.com · allflex.global · herddogg.com · datamars.com<br>
+      <strong>技术数据来源：</strong>antennity.com · fiware.org · tracxn.com · pitchbook.com · LinkedIn<br>
+      <strong>报告生成时间：</strong>2026年4月24日 · 由 Manus AI 基于 company-research Skill 框架生成
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+  <p>Digitanimal 深度调研报告 · 2026年4月 · 由 <strong style="color:#80cbc4;">Manus AI</strong> 生成</p>
+  <p style="margin-top:8px;">数据来源：digitanimal.com · Grand View Research · MarketsandMarkets · Tracxn · LinkedIn</p>
+  <p style="margin-top:8px;font-size:11px;opacity:0.6;">本报告仅供参考，所有数据均来自公开信息源，不构成投资建议。</p>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+// Register datalabels plugin
+Chart.register(ChartDataLabels);
+
+// ===== SCROLL TO SECTION =====
+function scrollTo(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// ===== FADE IN OBSERVER =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// ===== CHART DEFAULTS =====
+Chart.defaults.font.family = "'Segoe UI', 'PingFang SC', sans-serif";
+Chart.defaults.plugins.datalabels.display = false;
+
+// ===== 1. DISCOUNT CHART =====
+new Chart(document.getElementById('discountChart'), {
+  type: 'bar',
+  data: {
+    labels: ['1个', '2个', '3个', '4个', '5个', '10个'],
+    datasets: [
+      {
+        label: '原价 (€)',
+        data: [189.95, 379.90, 569.85, 759.80, 949.75, 1799.50],
+        backgroundColor: 'rgba(200,230,201,0.8)',
+        borderColor: '#81c784',
+        borderWidth: 1,
+        borderRadius: 4,
+      },
+      {
+        label: '折扣价 (€)',
+        data: [189.95, 350.26, 498.39, 660.27, 795.71, 1420.44],
+        backgroundColor: 'rgba(45,125,70,0.85)',
+        borderColor: '#2d7d46',
+        borderWidth: 1,
+        borderRadius: 4,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top' },
+      datalabels: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => `${ctx.dataset.label}: €${ctx.parsed.y.toFixed(2)}`
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: { callback: v => '€' + v }
+      }
+    }
+  }
+});
+
+// ===== 2. TECH RADAR (replaced with bar chart for clarity) =====
+new Chart(document.getElementById('techRadar'), {
+  type: 'bar',
+  data: {
+    labels: ['Sigfox', 'LoRa', 'NB-IoT', 'GSM', 'Astrocast卫星', '5G NTN'],
+    datasets: [{
+      label: '技术成熟度',
+      data: [60, 65, 85, 90, 80, 95],
+      backgroundColor: [
+        'rgba(144,164,174,0.7)',
+        'rgba(144,164,174,0.7)',
+        'rgba(76,175,80,0.8)',
+        'rgba(76,175,80,0.8)',
+        'rgba(21,101,192,0.8)',
+        'rgba(45,125,70,0.9)',
+      ],
+      borderColor: ['#90a4ae','#90a4ae','#4caf50','#4caf50','#1565c0','#2d7d46'],
+      borderWidth: 2,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      datalabels: {
+        display: true,
+        anchor: 'end',
+        align: 'end',
+        formatter: v => v + '%',
+        font: { weight: 'bold', size: 12 },
+        color: '#2c3e50'
+      }
+    },
+    scales: {
+      x: { max: 100, ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+
+// ===== 3. MARKET GROWTH CHART =====
+new Chart(document.getElementById('marketGrowthChart'), {
+  type: 'line',
+  data: {
+    labels: ['2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030', '2031', '2032', '2033'],
+    datasets: [{
+      label: '市场规模 (十亿美元)',
+      data: [4.5, 5.1, 5.73, 6.46, 7.29, 8.22, 9.27, 10.46, 11.80, 13.31, 14.82],
+      borderColor: '#2d7d46',
+      backgroundColor: 'rgba(45,125,70,0.1)',
+      borderWidth: 3,
+      pointBackgroundColor: '#2d7d46',
+      pointRadius: 5,
+      fill: true,
+      tension: 0.4,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      datalabels: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => `$${ctx.parsed.y.toFixed(2)}B`
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: false,
+        ticks: { callback: v => '$' + v + 'B' }
+      }
+    }
+  }
+});
+
+// ===== 4. REGION CHART =====
+new Chart(document.getElementById('regionChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['北美', '欧洲', '亚太', '拉丁美洲', '中东/非洲'],
+    datasets: [{
+      data: [38, 28, 20, 9, 5],
+      backgroundColor: ['#1565c0','#2d7d46','#00796b','#e65100','#6a1b9a'],
+      borderWidth: 2,
+      borderColor: '#fff',
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'right' },
+      datalabels: {
+        display: true,
+        formatter: (v, ctx) => ctx.chart.data.labels[ctx.dataIndex] + '\n' + v + '%',
+        color: '#fff',
+        font: { weight: 'bold', size: 11 },
+      }
+    }
+  }
+});
+
+// ===== 5. PRICE CHART =====
+new Chart(document.getElementById('priceChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Digitanimal EVO', 'Digitanimal ECO', 'Ceres Tag', 'Moocall', 'Allflex\n(月费×12)', 'HerdDogg\n(年费)'],
+    datasets: [{
+      label: '年均成本 (USD)',
+      data: [200, 212, 193, 299, 432, 29],
+      backgroundColor: [
+        'rgba(45,125,70,0.85)',
+        'rgba(76,175,80,0.85)',
+        'rgba(21,101,192,0.7)',
+        'rgba(230,81,0,0.7)',
+        'rgba(198,40,40,0.7)',
+        'rgba(144,164,174,0.7)',
+      ],
+      borderRadius: 6,
+      borderWidth: 0,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      datalabels: {
+        display: true,
+        anchor: 'end',
+        align: 'end',
+        formatter: v => '$' + v,
+        font: { weight: 'bold', size: 11 },
+        color: '#2c3e50'
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: { callback: v => '$' + v }
+      }
+    }
+  }
+});
+
+// ===== 6. RADAR CHART =====
+new Chart(document.getElementById('radarChart'), {
+  type: 'radar',
+  data: {
+    labels: ['技术创新', '价格竞争力', '市场覆盖', '品牌知名度', '健康监测', '卫星连接', '虚拟围栏'],
+    datasets: [
+      {
+        label: 'Digitanimal',
+        data: [90, 85, 80, 55, 65, 90, 88],
+        borderColor: '#2d7d46',
+        backgroundColor: 'rgba(45,125,70,0.15)',
+        borderWidth: 2,
+        pointBackgroundColor: '#2d7d46',
+      },
+      {
+        label: 'Allflex (Merck)',
+        data: [75, 45, 95, 95, 95, 50, 40],
+        borderColor: '#1565c0',
+        backgroundColor: 'rgba(21,101,192,0.1)',
+        borderWidth: 2,
+        pointBackgroundColor: '#1565c0',
+      },
+      {
+        label: 'Ceres Tag',
+        data: [85, 60, 70, 65, 55, 95, 30],
+        borderColor: '#e65100',
+        backgroundColor: 'rgba(230,81,0,0.1)',
+        borderWidth: 2,
+        pointBackgroundColor: '#e65100',
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom' },
+      datalabels: { display: false }
+    },
+    scales: {
+      r: {
+        min: 0, max: 100,
+        ticks: { stepSize: 20, font: { size: 10 } },
+        pointLabels: { font: { size: 11 } }
+      }
+    }
+  }
+});
+
+// ===== NAV SCROLL HIGHLIGHT =====
+window.addEventListener('scroll', () => {
+  const sections = ['overview','timeline','products','tech','market','competitors','marketing','swot','risks'];
+  let current = '';
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && window.scrollY >= el.offsetTop - 120) current = id;
+  });
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', sections[i] === current);
+  });
+});
+</script>
+</body>
+</html>
